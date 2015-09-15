@@ -1,0 +1,235 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/templates/ui.xhtml">
+<ui:define name="head">
+
+</ui:define>
+
+<ui:define name="content">
+<div class="layout-portlets-box">
+<div class="Container100">
+<div class="ContainerIndent">
+<div style="margin:5px;">
+<h:form id="form">
+
+<p:layout style="min-width:400px;min-height:570px; height: auto">
+    <script>
+        function test(){
+            alert("jjjj");
+        }
+    </script>
+    <p:layoutUnit position="west" resizable="true" size="250" minSize="100" maxSize="250">
+
+        <p:growl id="msgs" showDetail="true" />
+        <f:facet name="header">角色管理</f:facet>
+        <h:panelGrid columns="2">
+            <p:tree id="tree1" value="#{roleManagerAction.root1}" var="node" selectionMode="single" selection="#{roleManagerAction.selectedNode}"
+                     dynamic="true">
+                <p:ajax event="select" listener="#{roleManagerAction.onQuery}" update=":form:pdt" />
+                <p:treeNode>
+                    <h:outputText value="#{node}" />
+                </p:treeNode>
+            </p:tree>
+            <p:contextMenu for="tree1">
+                <p:menuitem value="添加角色" update="msgs" actionListener="#{roleManagerAction.selectTreeAction('Add')}"
+                            onclick="PF('wVDlgViewForAdd').show()" icon="ui-icon-add" />
+                <p:menuitem value="修改角色" update=":form:pgViewForUpd" actionListener="#{roleManagerAction.selectTreeAction('Upd')}"
+                            onclick="PF('wVDlgViewForUpd').show()" icon="ui-icon-arrowrefresh-1-w" />
+                <p:menuitem value="删除角色" update=":form:pgViewForDel" actionListener="#{roleManagerAction.selectTreeAction('Del')}"
+                            onclick="PF('wVDlgViewForDel').show()" icon="ui-icon-close"/>
+                <p:menuitem value="角色授权" update=":form:pgRecordForAdd" actionListener="#{roleManagerAction.selectRecordAction('Add','')}"
+                            onclick="PF('wVDlgRecordForAdd').show()" icon="ui-icon-add"/>
+            </p:contextMenu>
+        </h:panelGrid>
+
+    </p:layoutUnit>
+    <p:layoutUnit position="center">
+        <f:facet name="header">角色授权</f:facet>
+        <p:dataTable id="pdt"
+                     tableStyle="width: auto"
+                     value="#{roleManagerAction.ptroleResList}" var="record"
+                     emptyMessage="数据记录为空...">
+            <p:column headerText="操作" style="width:80px;text-align: center;">
+                <!--<p:commandButton  icon="ui-icon-pencil"-->
+                                  <!--style="height:18px;width:20px"-->
+                                  <!--action="#{roleManagerAction.selectRecordAction('Upd',record)}"-->
+                                  <!--update=":form:pgViewForUpd,:form:pdt"-->
+                                  <!--onclick="PF('wVDlgViewForUpd').show()">-->
+                <!--</p:commandButton>-->
+                <p:commandButton  icon="ui-icon-trash"
+                                  style="height:18px;width:20px"
+                                  action="#{roleManagerAction.selectRecordAction('Del',record)}"
+                                  update=":form:pgRecordForDel,:form:pdt"
+                                  onclick="PF('wVDlgRecordForDel').show()"
+                        >
+                </p:commandButton>
+            </p:column>
+            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resId}" filterBy="#{record.resId}" filterMatchMode="contains" >
+                <f:facet name="header">
+                    资源ID
+                </f:facet>
+                <h:outputText value="#{record.resId}"/>
+            </p:column>
+            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resName}" filterBy="#{record.resName}" filterMatchMode="contains" >
+                <f:facet name="header">
+                    资源名称
+                </f:facet>
+                <h:outputText value="#{record.resName}"/>
+            </p:column>
+            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resType}" filterBy="#{record.resType}" filterMatchMode="contains" >
+                <f:facet name="header">
+                    资源类型
+                </f:facet>
+                <h:outputText value="#{record.resType}"/>
+            </p:column>
+
+        </p:dataTable>
+    </p:layoutUnit>
+</p:layout>
+<!--角色授权新增-->
+<p:dialog id="dlgRecordForAdd" header="角色授权" widgetVar="wVDlgRecordForAdd"
+          resizable="false" modal="true"
+          showEffect="clip" hideEffect="fold" height="480" width="380">
+    <h:panelGrid id="pgRecordForAdd">
+
+
+        <p:tree id="tree2" value="#{roleManagerAction.root2}" var="node" selectionMode="checkbox" selection="#{roleManagerAction.selectedNode2}"
+                 dynamic="true" propagateSelectionDown="false" propagateSelectionUp="false">
+            <p:treeNode>
+                <h:outputText value="#{node}"/>
+            </p:treeNode>
+        </p:tree>
+    </h:panelGrid>
+    <f:facet name="footer">
+        <h:panelGrid id="pgOperBtnRecordForAdd">
+            <p:commandButton id="submitBtnRecordForAdd"
+                             value="提交（授权）"
+                             action="#{roleManagerAction.submitThisRecordAction(roleManagerAction.selectedNode2)}"
+                             update=":form:pgRecordForAdd,:form:pdt"
+                             oncomplete="PF('wVDlgRecordForAdd').hide()">
+            </p:commandButton>
+        </h:panelGrid>
+    </f:facet>
+
+</p:dialog>
+<!--角色授权删除-->
+    <p:dialog id="dlgRecordForDel" header="角色管理删除信息" widgetVar="wVDlgRecordForDel"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgRecordForDel">
+            <h:panelGrid columns="4">
+                <p:outputLabel value="资源ID：" for="resIdDel"/>
+                <p:inputText id="resIdDel" value="#{roleManagerAction.ptroleResDel.resId}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <p:outputLabel value="资源名称：" for="resNameDel"/>
+                <p:inputText id="resNameDel" value="#{roleManagerAction.ptroleResDel.resName}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <p:outputLabel value="资源类型：" for="resTypeDel"/>
+                <p:inputText id="resTypeDel" value="#{roleManagerAction.ptroleResDel.resType}" readonly="true"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="pgOperBtnRecordForDel">
+                <p:commandButton id="submitBtnRecordForDel"
+                                 value="提交（删除）"
+                                 action="#{roleManagerAction.submitThisRecordAction('')}"
+                                 update=":form:pgRecordForDel,:form:pdt"
+                                 oncomplete="PF('wVDlgRecordForDel').hide()">
+                </p:commandButton>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
+<!--新增-->
+    <p:dialog id="dlgViewForAdd" header="角色管理新增信息" widgetVar="wVDlgViewForAdd"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgViewForAdd">
+            <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色ID：" for="roleIdAdd"/>
+                <p:inputText id="roleIdAdd" value="#{roleManagerAction.ptroleAdd.roleId}"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色描述：" for="roleDescAdd"/>
+                <p:inputText id="roleDescAdd" value="#{roleManagerAction.ptroleAdd.roleDesc}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pgOperBtnForAdd" columns="4">
+                <p:commandButton id="submitBtnForAdd"
+                                 value="提交（新增）"
+                                 action="#{roleManagerAction.submitThisTreeAction}"
+                                 update=":form:tree1,:form:pgViewForAdd"
+                                 validateClient="true"
+                                 oncomplete="PF('wVDlgViewForAdd').hide()">
+                </p:commandButton>
+                <p:commandButton id="resetBtnForAdd" value="重置"
+                                 type="reset"
+                                 update="pgViewForAdd">
+                </p:commandButton>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
+<!--修改-->
+    <p:dialog id="dlgViewForUpd" header="角色管理更新信息" widgetVar="wVDlgViewForUpd"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <p:messages autoUpdate="true"/>
+        <h:panelGrid id="pgViewForUpd">
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色ID：" for="roleIdUpd"/>
+                <p:inputText id="roleIdUpd" value="#{roleManagerAction.ptroleUpd.roleId}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色描述：" for="roleDescUpd"/>
+                <p:inputText id="roleDescUpd" value="#{roleManagerAction.ptroleUpd.roleDesc}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pgOperBtnForUpd" columns="4">
+                <p:commandButton id="submitBtnForUpd"
+                                 value="提交（更新）"
+                                 action="#{roleManagerAction.submitThisTreeAction}"
+                                 update=":form:tree1"
+                                 validateClient="true"
+                                 oncomplete="PF('wVDlgViewForUpd').hide()">
+                </p:commandButton>
+                <p:commandButton id="resetBtnForUpd" value="重置"
+                                 type="reset"
+                                 update="pgViewForUpd">
+                </p:commandButton>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
+<!--删除-->
+    <p:dialog id="dlgViewForDel" header="角色管理删除信息" widgetVar="wVDlgViewForDel"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgViewForDel">
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色ID：" for="roleIdDel"/>
+                <p:inputText id="roleIdDel" value="#{roleManagerAction.ptroleDel.roleId}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <p:outputLabel value="角色描述：" for="roleDescDel"/>
+                <p:inputText id="roleDescDel" value="#{roleManagerAction.ptroleDel.roleDesc}" readonly="true"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="pgOperBtnForDel">
+                <p:commandButton id="submitBtnForDel"
+                                 value="提交（删除）"
+                                 action="#{roleManagerAction.submitThisTreeAction}"
+                                 update=":form:tree1,:form:pdt"
+                                 oncomplete="PF('wVDlgViewForDel').hide()">
+                </p:commandButton>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
+</h:form>
+</div>
+</div>
+</div>
+</div>
+</ui:define>
+</ui:composition>

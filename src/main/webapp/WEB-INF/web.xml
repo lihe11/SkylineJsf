@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         version="3.0"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <session-config>
+        <session-timeout>600</session-timeout>
+    </session-config>
+
+    <!--spark-->
+<!--
+    <filter>
+        <filter-name>SparkFilter</filter-name>
+        <filter-class>spark.servlet.SparkFilter</filter-class>
+        <init-param>
+            <param-name>applicationClass</param-name>
+            <param-value>skyline.spark.Main</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>SparkFilter</filter-name>
+        <url-pattern>/spark/*</url-pattern>
+    </filter-mapping>
+-->
+
+    <!--FileUpload-->
+    <filter>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>LoginCheckFilter</filter-name>
+        <filter-class>
+            pub.auth.LoginCheckFilter
+        </filter-class>
+        <init-param>
+            <param-name>loginPage</param-name>
+            <param-value>/pages/security/timeout.jsp</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
+<!--
+    <filter-mapping>
+        <filter-name>LoginCheckFilter</filter-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </filter-mapping>
+-->
+
+
+    <!--primefaces-->
+    <context-param>
+        <param-name>com.sun.faces.allowTextChildren</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <!--<param-value>aristo</param-value>-->
+        <!--<param-value>hot-sneaks</param-value>-->
+        <param-value>spark-blue</param-value>
+    </context-param>
+
+
+
+    <!--JSF2 配置-->
+    <context-param>
+        <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+        <!--<param-value>Production</param-value>-->
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.CONFIG_FILES</param-name>
+        <param-value>/WEB-INF/faces-config.xml</param-value>
+    </context-param>
+
+
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- 加载Spring配置文件 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:applicationContext.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>ImgServlet</servlet-name>
+        <servlet-class>pub.platform.security.ImgServlet</servlet-class>
+    </servlet>
+
+    <!--<servlet>-->
+    <!--<servlet-name>login</servlet-name>-->
+    <!--<jsp-file>/index.jsp</jsp-file>-->
+    <!--</servlet>-->
+
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>pub.platform.security.AdminServlet</servlet-class>
+    </servlet>
+
+    <!--JSF2 mapping-->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <!--<url-pattern>/faces/*</url-pattern>-->
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ImgServlet</servlet-name>
+        <url-pattern>/signjpg</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Action Servlet Mapping -->
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>*.login</url-pattern>
+    </servlet-mapping>
+
+<!--
+    <welcome-file-list>
+            <welcome-file>index.login</welcome-file>
+    </welcome-file-list>
+-->
+
+    <welcome-file-list>
+        <welcome-file>login.xhtml</welcome-file>
+    </welcome-file-list>
+
+    <listener>
+        <listener-class>pub.auth.OperOnLineSessionListener</listener-class>
+    </listener>
+
+
+
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/font-sfnt</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>application/font-woff2</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/vnd.ms-fontobject</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot?#iefix</extension>
+        <mime-type>application/vnd.ms-fontobject</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg#exosemibold</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg#exobolditalic</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg#exomedium</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg#exoregular</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg#fontawesomeregular</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>xls</extension>
+        <mime-type>application/vnd.ms-excel</mime-type>
+    </mime-mapping>
+</web-app>
