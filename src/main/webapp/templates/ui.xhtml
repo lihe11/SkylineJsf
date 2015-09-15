@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+    </f:facet>
+    <title>青岛市分行综合数据平台</title>
+    <h:outputScript name="js/layout.js" library="spark-layout"/>
+
+    <style type="text/css">
+        .col-95 {
+            width: 95%;
+        }
+
+        .col-5 {
+            width: 5%;
+        }
+
+        /*多个fieldset并列时使用 */
+        .topAligned td {
+            vertical-align: top;
+        }
+
+/*
+        .ui-inputfield {
+            font-size: 12px;
+            padding: 6px !important;
+        }
+
+        .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td {
+            white-space: nowrap;
+            font-weight: normal;
+            font-size: 12px !important;
+        }
+
+        .ui-datatable .ui-paginator .ui-paginator-current {
+            font-size: 12px;
+        }
+
+        .ui-datatable .ui-paginator .ui-paginator-first, .ui-datatable .ui-paginator .ui-paginator-prev,
+        .ui-datatable .ui-paginator .ui-paginator-pages .ui-paginator-page, .ui-datatable .ui-paginator .ui-paginator-next,
+        .ui-datatable .ui-paginator .ui-paginator-last, .ui-datatable .ui-paginator .ui-paginator-rpp-options {
+            font-size: 12px;
+        }
+
+        .ui-fieldset-legend {
+            font-size: 12px;
+        }
+
+        .ui-fieldset-content {
+            font-size: 12px;
+        }
+
+        .list-item {
+            font-size: 12px;
+        }
+
+        .ui-tabs-top .ui-tabs-nav li a {
+            font-size: 12px;
+            font-weight: normal;
+        }
+*/
+
+
+    </style>
+
+
+    <ui:insert name="head"/>
+</h:head>
+
+<h:body>
+    <div id="menu-mask"></div>
+
+    <ui:include src="/WEB-INF/topbar.xhtml"/>
+
+    <ui:include src="/WEB-INF/layoutmenu.xhtml"/>
+
+    <div id="layout-portlets-cover">
+        <ui:include src="/templates/txnmenu.xhtml"/>
+
+        <ui:insert name="content">
+            Template
+        </ui:insert>
+<!--20150820 优化页面-->
+        <!--<div class="layout-portlets-box TexAlCenter">-->
+            <!--<span class="Fs14 gray FontRalewayRegular">FBI corp.  | 2015  All rights reserved.</span>-->
+        <!--</div>-->
+    </div>
+
+    <p:ajaxStatus style="width:32px;height:32px;position:fixed;right:7px;bottom:7px">
+        <f:facet name="start">
+            <p:graphicImage name="images/preloader.gif" library="spark-layout"/>
+        </f:facet>
+
+        <f:facet name="complete">
+            <h:outputText value=""/>
+        </f:facet>
+    </p:ajaxStatus>
+
+    <h:outputStylesheet name="css/core-layout.css" library="spark-layout"/>
+    <h:outputStylesheet name="css/font-awesome.css" library="spark-layout"/>
+    <h:outputStylesheet name="css/animate.css" library="spark-layout"/>
+    <h:outputStylesheet name="css/spark-layout#{themeView.color}.css" library="spark-layout"/>
+</h:body>
+
+</html>
