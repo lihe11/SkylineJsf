@@ -49,6 +49,18 @@
                          tableStyle="width: auto"
                          value="#{deptManagerAction.operList}" var="record"
                          emptyMessage="数据记录为空...">
+                <p:column headerText="操作" style="width:80px;text-align: center;">
+                    <h:panelGrid columns="8">
+                        <p:commandLink  styleClass="ui-icon ui-icon-trash"
+                                          style="height:18px;width:20px"
+                                          title="删除"
+                                          action="#{deptManagerAction.selectRecordAction('operDel',record)}"
+                                          update=":form:pgRecordForDel,:form:pdt"
+                                          onclick="PF('wVDlgRecordForDel').show()"
+                                >
+                        </p:commandLink>
+                    </h:panelGrid>
+                </p:column>
 
                 <p:column style="text-align:center; width: 250px"  sortBy="#{record.operid}" filterBy="#{record.operid}" filterMatchMode="contains" >
                     <f:facet name="header">
@@ -81,9 +93,96 @@
                     <h:outputText value="#{record.opertype}"/>
                 </p:column>
 
+                <p:column headerText="用户授权" style="width:250px;text-align: center;">
+                    <h:panelGrid columns="8">
+                        <p:commandLink  styleClass="ui-icon ui-icon-search"
+                                          style="height:18px;width:20px"
+                                          title="查看权限"
+                                          action="#{deptManagerAction.selectRecordAction('operRoleSearch',record)}"
+                                          update=":form:pgRecordForRoleSearch,:form:pdt"
+                                          onclick="PF('wVDlgRecordForRoleSearch').show()"
+                                >
+                        </p:commandLink>
+                        <p:commandLink  styleClass="ui-icon ui-icon-arrowrefresh-1-w"
+                                        style="height:18px;width:20px"
+                                        title="修改权限"
+                                        action="#{deptManagerAction.selectRecordAction('operRoleUpd',record)}"
+                                        update=":form:pgRecordForRoleUpd,:form:pdt"
+                                        onclick="PF('wVDlgRecordForRoleUpd').show()"
+                                >
+                        </p:commandLink>
+                    </h:panelGrid>
+                </p:column>
+
             </p:dataTable>
         </p:layoutUnit>
     </p:layout>
+
+    <!--用户权限编辑-->
+    <p:dialog id="dlgRecordForRoleUpd" header="用户授权" widgetVar="wVDlgRecordForRoleUpd"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgRecordForRoleUpd">
+            <p:tree id="tree2" value="#{deptManagerAction.root2}" var="node" selectionMode="checkbox" selection="#{deptManagerAction.selectedNode2}"
+                    dynamic="true">
+                <p:treeNode>
+                    <h:outputText value="#{node}"/>
+                </p:treeNode>
+            </p:tree>
+        </h:panelGrid>
+        <f:facet name="footer">
+            <h:panelGrid id="pgOperBtnRecordForRoleUpd">
+                <p:commandButton id="submitBtnRecordForRoleUpd"
+                                 value="提交（授权）"
+                                 action="#{deptManagerAction.submitThisRecordAction('')}"
+                                 update=":form:pgRecordForRoleUpd,:form:pdt"
+                                 oncomplete="PF('wVDlgRecordForRoleUpd').hide()">
+                </p:commandButton>
+            </h:panelGrid>
+        </f:facet>
+    </p:dialog>
+    <!--用户权限查看-->
+    <p:dialog id="dlgRecordForRoleSearch" widgetVar="wVDlgRecordForRoleSearch"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgRecordForRoleSearch">
+            <h:panelGrid columns="4">
+                <p:dataList value="#{deptManagerAction.operRoleList}" var="operRole" type="ordered">
+                    <f:facet name="header">
+                        用户权限信息列表
+                    </f:facet>
+                    #{operRole.roleDesc}(#{operRole.roleId})
+                </p:dataList>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
+    <!--用户删除-->
+    <p:dialog id="dlgRecordForDel" header="用户删除信息" widgetVar="wVDlgRecordForDel"
+              resizable="false" modal="true"
+              showEffect="clip" hideEffect="fold">
+        <h:panelGrid id="pgRecordForDel">
+            <h:panelGrid columns="4">
+                <p:outputLabel value="所在机构：" for="pdeptNameDel"/>
+                <p:inputText id="pdeptNameDel" value="#{deptManagerAction.deptName}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="8">
+                <p:outputLabel value="操作员号：" for="operIdDel"/>
+                <p:inputText id="operIdDel" value="#{deptManagerAction.ptoperDel.operid}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid columns="8">
+                <p:outputLabel value="操作员姓名：" for="operNameDel"/>
+                <p:inputText id="operNameDel" value="#{deptManagerAction.ptoperDel.opername}" readonly="true"/>
+            </h:panelGrid>
+            <h:panelGrid id="pgOperBtnRecordForDel">
+                <p:commandButton id="submitBtnRecordForDel"
+                                 value="提交（删除）"
+                                 action="#{deptManagerAction.submitThisRecordAction('')}"
+                                 update=":form:pgRecordForDel,:form:pdt"
+                                 oncomplete="PF('wVDlgRecordForDel').hide()">
+                </p:commandButton>
+            </h:panelGrid>
+        </h:panelGrid>
+    </p:dialog>
 <!--新增用户-->
     <p:dialog id="dlgRecordForAdd" header="添加用户" widgetVar="wVDlgRecordForAdd"
               resizable="false" modal="true"
@@ -117,8 +216,8 @@
                 </p:selectOneMenu>
                 <p:outputLabel value="电子邮件：" for="emailAdd"/>
                 <p:inputText id="emailAdd" value="#{deptManagerAction.ptoperAdd.email}">
-                    <f:validateRegex
-                            pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                    <!--<f:validateRegex-->
+                            <!--pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />-->
                 </p:inputText>
             </h:panelGrid>
             <h:panelGrid columns="8">

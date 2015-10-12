@@ -16,7 +16,7 @@
                     <div style="margin:5px;">
                         <h:form id="form">
 
-                            <p:layout style="min-width:100px;min-height:510px;">
+                            <p:layout style="min-width:400px;min-height:570px;">
                                 <p:layoutUnit position="west" resizable="true" size="250" minSize="100" maxSize="300">
 
                                         <p:growl id="msgs" showDetail="true" />
@@ -36,6 +36,7 @@
                                                             onclick="PF('wVTreeMenuForUpd').show()" icon="ui-icon-arrowrefresh-1-w" />
                                                 <p:menuitem value="添加主菜单" update="msgs" onclick="PF('wVTreeMenuForAdd').show()" icon="ui-icon-add" />
                                                 <p:menuitem value="删除主菜单" update=":form:pgTreeMenuForDelete,:form:pdt" actionListener="#{menuDragDropView.treeMenuAction('delete')}" onclick="PF('wVTreeMenuForDelete').show()" icon="ui-icon-close"/>
+                                                <p:menuitem value="新增子菜单" update=":form:pgViewForAdd,:form:pdt" actionListener="#{menuDragDropView.treeMenuAction('subadd')}" onclick="PF('wVDlgViewForAdd').show()" icon="ui-icon-add"/>
                                             </p:contextMenu>
 
                                             <script language="JavaScript">
@@ -46,34 +47,6 @@
                                                 };
                                             </script>
                                         </h:panelGrid>
-                                    <h:panelGrid columns="3">
-                                        <p:tree  id="tree2" value="#{menuDragDropView.root1}" var="node" selectionMode="single" selection="#{menuDragDropView.selectedNode}"
-                                                 dynamic="true">
-                                            <p:ajax event="dragdrop" listener="#{menuDragDropView.onDragDrop}" update=":form:msgs"/>
-                                            <p:ajax event="select" listener="#{menuDragDropView.onQuery}" update=":form:pdt" />
-
-                                            <p:treeNode>
-                                                <h:outputText value="#{node}" />
-                                            </p:treeNode>
-                                        </p:tree>
-                                    </h:panelGrid>
-                                    <!--<h:panelGrid columns="3">-->
-                                        <!--<p:tree  id="tree1" value="#{systemManager.root1}" var="node2" selectionMode="single" selection="#{systemManager.selectedNode}"-->
-                                                 <!--dynamic="true">-->
-                                            <!--&lt;!&ndash;<p:ajax event="dragdrop" listener="#{menuDragDropView.onDragDrop}" update=":form:msgs"/>&ndash;&gt;-->
-                                            <!--<p:ajax event="select" listener="#{systemManager.onQuery}" update=":form:pdt" />-->
-
-                                            <!--<p:treeNode>-->
-                                                <!--<h:outputText value="#{node2}" />-->
-                                            <!--</p:treeNode>-->
-                                        <!--</p:tree>-->
-                                        <!--<p:contextMenu for="tree2">-->
-                                            <!--<p:menuitem value="修改主菜单" update=":form:pgTreeMenuForUpd,:form:pdt" actionListener="#{systemManager.treeMenuAction('update')}"-->
-                                                        <!--onclick="PF('wVTreeMenuForUpd').show()" icon="ui-icon-arrowrefresh-1-w" />-->
-                                            <!--<p:menuitem value="添加主菜单" update="msgs" onclick="PF('wVTreeMenuForAdd').show()" icon="ui-icon-add" />-->
-                                            <!--<p:menuitem value="删除主菜单" update=":form:pgTreeMenuForDelete,:form:pdt" actionListener="#{systemManager.treeMenuAction('delete')}" onclick="PF('wVTreeMenuForDelete').show()" icon="ui-icon-close"/>-->
-                                        <!--</p:contextMenu>-->
-                                    <!--</h:panelGrid>-->
                                 </p:layoutUnit>
 
                                 <p:layoutUnit position="center">
@@ -85,35 +58,34 @@
                                             <!--<h:outputText value=""/>-->
                                         <!--</f:facet>-->
                                     <!--</p:ajaxStatus>-->
-                                    <p:panel>
-                                        <p:commandButton  value="新增子菜单"
-                                                          update=":form:pgViewForAdd,:form:pdt"
-                                                          actionListener="#{menuDragDropView.treeMenuAction('subadd')}"
-                                                          onclick="PF('wVDlgViewForAdd').show()">
-                                        </p:commandButton>
-                                    </p:panel>
+
                                     <!--<p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />-->
+                                    <f:facet name="header">管理</f:facet>
                                     <p:dataTable id="pdt"
                                                  tableStyle="width: auto"
                                                  value="#{menuDragDropView.menuList}" var="record"
 
                                                  emptyMessage="数据记录为空...">
                                         <p:column headerText="操作" style="width:80px;text-align: center;">
-                                            <p:commandButton  icon="ui-icon-pencil"
-                                                              style="height:18px;width:18px"
-                                                              action="#{menuDragDropView.selectRecordAction('Upd',record)}"
-                                                              update=":form:pgViewForUpd,:form:pdt"
-                                                              onclick="PF('wVDlgViewForUpd').show()">
-                                            </p:commandButton>
+                                            <h:panelGrid columns="4">
+                                                <p:commandLink  styleClass="ui-icon ui-icon-arrowrefresh-1-w"
+                                                                  style="height:18px;width:18px"
+                                                                  title="编辑子菜单"
+                                                                  action="#{menuDragDropView.selectRecordAction('Upd',record)}"
+                                                                  update=":form:pgViewForUpd,:form:pdt"
+                                                                  onclick="PF('wVDlgViewForUpd').show()">
+                                                </p:commandLink>
 
-                                            <p:commandButton  icon="ui-icon-trash"
-                                                              style="height:18px;width:18px"
-                                                              action="#{menuDragDropView.selectRecordAction('Del',record)}"
-                                                              update=":form:pgViewForDel,:form:pdt"
-                                                              onclick="PF('wVDlgViewForDel').show()"
-                                                    >
+                                                <p:commandLink  styleClass="ui-icon ui-icon-trash"
+                                                                title="删除子菜单"
+                                                                style="height:18px;width:18px"
+                                                                action="#{menuDragDropView.selectRecordAction('Del',record)}"
+                                                                update=":form:pgViewForDel,:form:pdt"
+                                                                onclick="PF('wVDlgViewForDel').show()"
+                                                        >
 
-                                            </p:commandButton>
+                                                </p:commandLink>
+                                            </h:panelGrid>
                                         </p:column>
                                         <p:column style="text-align:center"  sortBy="#{record.menulabel}"
                                                              filterBy="#{record.menulabel}" filterMatchMode="contains">
