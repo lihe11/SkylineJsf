@@ -74,17 +74,17 @@
                     </f:facet>
                     <h:outputText value="#{record.opername}"/>
                 </p:column>
-                <p:column style="text-align:center; width: 250px"  sortBy="#{record.issuper}" filterBy="#{record.issuper}" filterMatchMode="contains" >
+                <p:column style="text-align:center; width: 250px"  sortBy="#{record.issuper.replace('0','否').replace('1','是')}" filterBy="#{record.issuper.replace('0','否').replace('1','是')}" filterMatchMode="contains" >
                     <f:facet name="header">
                         是否领导
                     </f:facet>
-                    <h:outputText value="#{record.issuper}"/>
+                    <h:outputText value="#{record.issuper.replace('0','否').replace('1','是')}"/>
                 </p:column>
-                <p:column style="text-align:center; width: 250px"  sortBy="#{record.sex}" filterBy="#{record.sex}" filterMatchMode="contains" >
+                <p:column style="text-align:center; width: 250px"  sortBy="#{record.sex.replace('0','女').replace('1','男')}" filterBy="#{record.sex.replace('0','女').replace('1','男')}" filterMatchMode="contains" >
                     <f:facet name="header">
                         性别
                     </f:facet>
-                    <h:outputText value="#{record.sex}"/>
+                    <h:outputText value="#{record.sex.replace('0','女').replace('1','男')}"/>
                 </p:column>
                 <p:column style="text-align:center; width: 250px"  sortBy="#{record.opertype}" filterBy="#{record.opertype}" filterMatchMode="contains" >
                     <f:facet name="header">

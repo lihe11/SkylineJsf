@@ -22,9 +22,9 @@
                                     <p:growl id="msgs" showDetail="true" />
 
                                     <h:panelGrid columns="3">
-                                        <p:tree  id="tree1" value="#{menuDragDropView.root1}" var="node" selectionMode="single" selection="#{menuDragDropView.selectedNode}"
+                                        <p:tree  id="tree1" value="#{menuDragDropView1.root1}" var="node" selectionMode="single" selection="#{menuDragDropView1.selectedNode}"
                                                  dynamic="true">
-                                            <p:ajax event="select" listener="#{menuDragDropView.onQuery}" update="" />
+                                            <p:ajax event="select" listener="#{menuDragDropView1.onQuery}" update="" />
 
                                             <p:treeNode>
                                                 <h:outputText value="#{node}" />
@@ -37,7 +37,7 @@
 
                                 <p:layoutUnit position="center">
 
-                                    <iframe id="iframeCenter" width="100%" src="./menuManager.xhtml"
+                                    <iframe id="iframeCenter" width="100%" src="./menuManager.menuManager1.xhtml"
                                             height="100%" frameborder="0"></iframe>
 
 

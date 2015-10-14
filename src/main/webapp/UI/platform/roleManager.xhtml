@@ -17,11 +17,6 @@
 <h:form id="form">
 
 <p:layout style="min-width:400px;min-height:570px; height: auto">
-    <script>
-        function test(){
-            alert("jjjj");
-        }
-    </script>
     <p:layoutUnit position="west" resizable="true" size="250" minSize="100" maxSize="250">
 
         <p:growl id="msgs" showDetail="true" />
@@ -54,12 +49,6 @@
                      value="#{roleManagerAction.ptroleResList}" var="record"
                      emptyMessage="数据记录为空...">
             <p:column headerText="操作" style="width:40px;text-align: center;">
-                <!--<p:commandButton  icon="ui-icon-pencil"-->
-                                  <!--style="height:18px;width:20px"-->
-                                  <!--action="#{roleManagerAction.selectRecordAction('Upd',record)}"-->
-                                  <!--update=":form:pgViewForUpd,:form:pdt"-->
-                                  <!--onclick="PF('wVDlgViewForUpd').show()">-->
-                <!--</p:commandButton>-->
                 <h:panelGrid columns="4">
                     <p:commandLink  styleClass="ui-icon ui-icon-trash"
                                       style="height:18px;width:20px"
@@ -71,25 +60,18 @@
                     </p:commandLink>
                 </h:panelGrid>
             </p:column>
-            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resId}" filterBy="#{record.resId}" filterMatchMode="contains" >
+            <p:column style="text-align:center; width: 250px"  sortBy="#{record.menuid}" filterBy="#{record.menuid}" filterMatchMode="contains" >
                 <f:facet name="header">
-                    资源ID
+                    菜单ID
                 </f:facet>
-                <h:outputText value="#{record.resId}"/>
+                <h:outputText value="#{record.menuid}"/>
             </p:column>
-            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resName}" filterBy="#{record.resName}" filterMatchMode="contains" >
+            <p:column style="text-align:center; width: 250px"  sortBy="#{record.menulabel}" filterBy="#{record.menulabel}" filterMatchMode="contains" >
                 <f:facet name="header">
-                    资源名称
+                    菜单名称
                 </f:facet>
-                <h:outputText value="#{record.resName}"/>
+                <h:outputText value="#{record.menulabel}"/>
             </p:column>
-            <p:column style="text-align:center; width: 250px"  sortBy="#{record.resType}" filterBy="#{record.resType}" filterMatchMode="contains" >
-                <f:facet name="header">
-                    资源类型
-                </f:facet>
-                <h:outputText value="#{record.resType}"/>
-            </p:column>
-
         </p:dataTable>
     </p:layoutUnit>
 </p:layout>
@@ -125,18 +107,13 @@
               showEffect="clip" hideEffect="fold">
         <h:panelGrid id="pgRecordForDel">
             <h:panelGrid columns="4">
-                <p:outputLabel value="资源ID：" for="resIdDel"/>
-                <p:inputText id="resIdDel" value="#{roleManagerAction.ptroleResDel.resId}" readonly="true"/>
+                <p:outputLabel value="菜单ID：" for="resIdDel"/>
+                <p:inputText id="resIdDel" value="#{roleManagerAction.ptroleResDel.menuid}" readonly="true"/>
             </h:panelGrid>
             <h:panelGrid columns="4">
-                <p:outputLabel value="资源名称：" for="resNameDel"/>
-                <p:inputText id="resNameDel" value="#{roleManagerAction.ptroleResDel.resName}" readonly="true"/>
+                <p:outputLabel value="菜单名称：" for="resNameDel"/>
+                <p:inputText id="resNameDel" value="#{roleManagerAction.ptroleResDel.menulabel}" readonly="true"/>
             </h:panelGrid>
-            <h:panelGrid columns="4">
-                <p:outputLabel value="资源类型：" for="resTypeDel"/>
-                <p:inputText id="resTypeDel" value="#{roleManagerAction.ptroleResDel.resType}" readonly="true"/>
-            </h:panelGrid>
-
             <h:panelGrid id="pgOperBtnRecordForDel">
                 <p:commandButton id="submitBtnRecordForDel"
                                  value="提交（删除）"

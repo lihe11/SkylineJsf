@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import skyline.common.utils.MessageUtil;
-import skyline.repository.model.Ptresource;
+import skyline.repository.model.Ptmenu;
 import skyline.repository.model.Ptrole;
-import skyline.repository.model.PtroleRes;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -23,10 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by lihe
- * on 2015/9/2.16:32
- */
 @ManagedBean
 @ViewScoped
 public class RoleManagerAction implements Serializable {
@@ -53,9 +48,9 @@ public class RoleManagerAction implements Serializable {
     private Ptrole ptroleDel;
     private Ptrole ptroleAdd;
 
-    private PtroleRes ptroleResDel;
-    private List<PtroleRes> ptroleResList;
-    private List<Ptresource> roleAddList;
+    private Ptmenu ptroleResDel;
+    private List<Ptmenu> ptroleResList;
+    private List<Ptmenu> roleAddList;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @ManagedProperty(value = "#{skylineJdbc}")
     private NamedParameterJdbcTemplate skylineJdbc;
@@ -74,7 +69,6 @@ public class RoleManagerAction implements Serializable {
         for(Ptrole ptroleT:roleList){
             pnode = new DefaultTreeNode(ptroleT.getRoleDesc(), root1);
         }
-
         ptroleUpd = new Ptrole();
         ptroleDel = new Ptrole();
         ptroleAdd = new Ptrole();
@@ -91,8 +85,8 @@ public class RoleManagerAction implements Serializable {
             }
             Map<String,Object> paramMap = new HashMap<>();
             paramMap.put("roleId", roleId);
-            sql = "SELECT ROLER.ROLEID, R.RESID, M.MENULABEL RESNAME, R.RESTYPE FROM PTROLERES ROLER, PTRESOURCE R, PTMENU M WHERE (ROLER.RESID = R.RESID) AND (R.RESNAME = TRIM(M.MENUID)) AND (ROLEID = :roleId) ORDER BY R.RESID ";
-            ptroleResList = skylineJdbc.query(sql,paramMap, new BeanPropertyRowMapper<PtroleRes>(PtroleRes.class));
+            sql = "SELECT M.* FROM PTROLERES R, PTMENU M WHERE R.RESID = TRIM(M.MENUID) AND R.ROLEID =:roleId ORDER BY R.RESID ";
+            ptroleResList = skylineJdbc.query(sql,paramMap, new BeanPropertyRowMapper<Ptmenu>(Ptmenu.class));
         } catch (Exception e) {
             logger.error("查询数据时出现错误。", e);
             MessageUtil.addWarn("查询数据时出现错误。" + e.getMessage());
@@ -100,29 +94,29 @@ public class RoleManagerAction implements Serializable {
     }
 
     //  角色授权删除数据复制、新增列表展示
-    public void selectRecordAction(String strSubmitTypePara,PtroleRes ptroleResSelectedPara){
+    public void selectRecordAction(String strSubmitTypePara,Ptmenu ptroleResSelectedPara){
         try {
             if ("Del".equals(strSubmitTypePara)) {
-                ptroleResDel = (PtroleRes) BeanUtils.cloneBean(ptroleResSelectedPara);
+                ptroleResDel = (Ptmenu) BeanUtils.cloneBean(ptroleResSelectedPara);
             }else if("Add".equals(strSubmitTypePara)){
                 onQuery();
                 root2 = new DefaultTreeNode("Root", null);
                 try {
-                    sqlTree ="SELECT R.* FROM PTRESOURCE R,PTMENU T WHERE R.RESNAME = RTRIM(T.MENUID) ORDER BY T.LEVELIDX ASC ";
-                    roleAddList = skylineJdbc.query(sqlTree,new BeanPropertyRowMapper<Ptresource>(Ptresource.class));
+                    sqlTree ="SELECT * FROM PTMENU T ORDER BY T.LEVELIDX ASC ";
+                    roleAddList = skylineJdbc.query(sqlTree,new BeanPropertyRowMapper<Ptmenu>(Ptmenu.class));
                 } catch (Exception e) {
                     logger.error("查询数据时出现错误。", e);
                     MessageUtil.addWarn("查询数据时出现错误。" + e.getMessage());
                 }
-                for(Ptresource p:roleAddList){
-                    if("m0".equals(p.getParentresid())){
-                        pnode  = new DefaultTreeNode(p.getResid()+"_"+p.getResdesc(), root2);
-                        for(PtroleRes ptroleResT:ptroleResList) {
-                            if (ptroleResT.getResId().equals(p.getResid())) {
+                for(Ptmenu p:roleAddList){
+                    if("0".equals(p.getParentmenuid())){
+                        pnode  = new DefaultTreeNode(p.getMenuid()+"_"+p.getMenulabel(), root2);
+                        for(Ptmenu ptroleResT:ptroleResList) {
+                            if (ptroleResT.getMenuid().equals(p.getMenuid())) {
                                 pnode.setSelected(true);
                             }
                         }
-                        treeRecursion(p.getResid());
+                        treeRecursion(p.getMenuid(),pnode);
                     }
                 }
             }
@@ -132,19 +126,18 @@ public class RoleManagerAction implements Serializable {
         }
     }
 
-    public void treeRecursion(String treeid){
-        for(Ptresource pr:roleAddList) {
-            if (treeid.equals(pr.getParentresid())) {
+    public void treeRecursion(String treeid,TreeNode parentNode){
+        for(Ptmenu pr:roleAddList) {
+            if (treeid.equals(pr.getParentmenuid())) {
 //待优化
-                TreeNode cnode = new DefaultTreeNode(pr.getResid()+"_"+pr.getResdesc(), pnode);
-                for(PtroleRes ptroleResT:ptroleResList) {
-                    if (ptroleResT.getResId().equals(pr.getResid())) {
+                TreeNode cnode = new DefaultTreeNode(pr.getMenuid()+"_"+pr.getMenulabel(), parentNode);
+                for(Ptmenu ptroleResT:ptroleResList) {
+                    if (ptroleResT.getMenuid().equals(pr.getMenuid())) {
                         cnode.setSelected(true);
                     }
                 }
-                if(hasChild(pr.getResid())){
-                    pnode = cnode;
-                    treeRecursion(pr.getResid());
+                if(hasChild(pr.getMenuid())){
+                    treeRecursion(pr.getMenuid(),cnode);
                 }
             }
         }
@@ -152,8 +145,8 @@ public class RoleManagerAction implements Serializable {
     //    判断主菜单是否有子节点
     public boolean hasChild(String treeid){
         boolean childFlag = false;
-        for(Ptresource pre:roleAddList) {
-            if (treeid.equals(pre.getParentresid())) {
+        for(Ptmenu pre:roleAddList) {
+            if (treeid.equals(pre.getParentmenuid())) {
                 childFlag = true;
                 break;
             }
@@ -166,8 +159,8 @@ public class RoleManagerAction implements Serializable {
         try {
             if ("Del".equals(strRecordSubmitType)) {
                 Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("roleId", ptroleResDel.getRoleId());
-                paramMap.put("resId", ptroleResDel.getResId());
+                paramMap.put("roleId", roleId);
+                paramMap.put("resId", ptroleResDel.getMenuid());
                 sqlD = "delete PTROLERES j WHERE j.roleid =:roleId and j.resid = :resId";
                 skylineJdbc.update(sqlD, paramMap);
             } else if("Add".equals(strRecordSubmitType)){
@@ -287,11 +280,11 @@ public class RoleManagerAction implements Serializable {
         this.roleList = roleList;
     }
 
-    public List<PtroleRes> getPtroleResList() {
+    public List<Ptmenu> getPtroleResList() {
         return ptroleResList;
     }
 
-    public void setPtroleResList(List<PtroleRes> ptroleResList) {
+    public void setPtroleResList(List<Ptmenu> ptroleResList) {
         this.ptroleResList = ptroleResList;
     }
 
@@ -327,11 +320,11 @@ public class RoleManagerAction implements Serializable {
         this.ptroleAdd = ptroleAdd;
     }
 
-    public PtroleRes getPtroleResDel() {
+    public Ptmenu getPtroleResDel() {
         return ptroleResDel;
     }
 
-    public void setPtroleResDel(PtroleRes ptroleResDel) {
+    public void setPtroleResDel(Ptmenu ptroleResDel) {
         this.ptroleResDel = ptroleResDel;
     }
 

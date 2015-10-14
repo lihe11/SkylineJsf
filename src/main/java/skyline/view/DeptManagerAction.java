@@ -12,6 +12,7 @@ import pub.auth.MD5Helper;
 import skyline.common.utils.MessageUtil;
 import skyline.repository.model.Ptdept;
 import skyline.repository.model.Ptoper;
+import skyline.repository.model.Ptrole;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -34,15 +35,20 @@ public class DeptManagerAction {
     private String sqlD;
     private String deptId;
     private String deptName;
+    private String operRoleUpdId;
     private String strSubmitType;
     private String strRecordType;
 
     private TreeNode root1;
+    private TreeNode root2;
     private TreeNode pnode;
     private TreeNode selectedNode;
+    private TreeNode[] selectedNode2;
 
     private List<Ptdept> deptList;
     private List<Ptoper> operList;
+    private List<Ptrole> operRoleList;
+    private List<Ptrole> operRoleAllList;
     private Ptdept ptdeptAdd;
     private Ptdept ptdeptUpd;
     private Ptdept ptdeptDel;
@@ -206,31 +212,104 @@ public class DeptManagerAction {
     }
 
     public void selectRecordAction(String strRecordTypePara,Ptoper ptoperSelectedPara){
-        deptId = selectedNode.getData().toString();
-        deptName = deptId.substring(0,deptId.lastIndexOf("("));
-        deptId = deptId.substring(deptId.lastIndexOf("(")+1,deptId.lastIndexOf(")"));
+        try {
+            ptoperAdd = new Ptoper();
+            ptoperUpd = new Ptoper();
+            ptoperDel = new Ptoper();
+            deptId = selectedNode.getData().toString();
+            deptName = deptId.substring(0, deptId.lastIndexOf("("));
+            deptId = deptId.substring(deptId.lastIndexOf("(") + 1, deptId.lastIndexOf(")"));
+            try {
+                if ("operDel".equals(strRecordTypePara)) {
+                    ptoperDel = (Ptoper) BeanUtils.cloneBean(ptoperSelectedPara);
+                } else if("operRoleSearch".equals(strRecordTypePara)){
+                    Map<String,Object> paramMap = new HashMap<>();
+                    paramMap.put("operid",ptoperSelectedPara.getOperid());
+                    sql = "SELECT t.roleid,t.roledesc,t.status FROM ptoperrole j LEFT JOIN ptrole t  ON j.roleid = t.roleid WHERE t.status ='1' AND j.operid =:operid ORDER BY t.roleid ASC ";
+                    operRoleList = skylineJdbc.query(sql,paramMap, new BeanPropertyRowMapper<Ptrole>(Ptrole.class));
+                } else if ("operRoleUpd".equals(strRecordTypePara)){
+                    operRoleUpdId = ptoperSelectedPara.getOperid();
+                    root2 = new DefaultTreeNode("Root", null);
+                    Map<String,Object> paramMap = new HashMap<>();
+                    paramMap.put("operid",operRoleUpdId);
+//                    获得该角色权限
+                    sql = "SELECT t.roleid,t.roledesc,t.status FROM ptoperrole j LEFT JOIN ptrole t  ON j.roleid = t.roleid WHERE t.status ='1' AND j.operid =:operid ORDER BY t.roleid ASC ";
+                    operRoleList = skylineJdbc.query(sql,paramMap, new BeanPropertyRowMapper<Ptrole>(Ptrole.class));
+//                    获得全部权限
+                    sqlD = "SELECT t.roleid,t.roledesc,t.status FROM ptrole t WHERE t.status ='1' ORDER BY t.roleid ASC";
+                    operRoleAllList = skylineJdbc.query(sqlD,new BeanPropertyRowMapper<Ptrole>(Ptrole.class));
+//                    生成权限树
+                    for(Ptrole pAll:operRoleAllList){
+                        pnode  = new DefaultTreeNode(pAll.getRoleDesc()+"("+pAll.getRoleId()+")", root2);
 
+                        for(Ptrole pSig:operRoleList){
+                            if(pSig.getRoleId().equals(pAll.getRoleId())){
+                                pnode.setSelected(true);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("查询数据时出现错误。", e);
+                MessageUtil.addWarn("查询数据时出现错误。" + e.getMessage());
+            }
 
-        strRecordType = strRecordTypePara;
+            strRecordType = strRecordTypePara;
+        }catch (Exception e){
+            MessageUtil.addError(e.getMessage());
+        }
 
     }
 
     public  void  submitThisRecordAction(String rrrr){
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("deptid", deptId);
-        paramMap.put("operid", ptoperAdd.getOperid());
-        paramMap.put("opername", ptoperAdd.getOpername());
-        paramMap.put("sex", ptoperAdd.getSex());
-        paramMap.put("issuper", ptoperAdd.getIssuper());//是否领导
-        paramMap.put("operphone", ptoperAdd.getOperphone());
-        paramMap.put("mobilephone", ptoperAdd.getMobilephone());
-        paramMap.put("otherphone", ptoperAdd.getOtherphone());
-        paramMap.put("operenabled", ptoperAdd.getOperenabled());//账号是否可用
-        paramMap.put("opertype", ptoperAdd.getOpertype());//类别
-        paramMap.put("email", ptoperAdd.getEmail());
-        paramMap.put("operpasswd", MD5Helper.getMD5String(ptoperAdd.getOperpasswd()));
-//PTOPERSEQUENCES.NEXTVAL
-
+        try {
+            Map<String, Object> paramMap = new HashMap<>();
+            if("operAdd".equals(strRecordType)) {
+                paramMap.put("deptid", deptId);
+                paramMap.put("operid", ptoperAdd.getOperid());
+                paramMap.put("opername", ptoperAdd.getOpername());
+                paramMap.put("sex", ptoperAdd.getSex());
+                paramMap.put("issuper", ptoperAdd.getIssuper());//是否领导
+                paramMap.put("operphone", ptoperAdd.getOperphone());
+                paramMap.put("mobilephone", ptoperAdd.getMobilephone());
+                paramMap.put("otherphone", ptoperAdd.getOtherphone());
+                paramMap.put("operenabled", ptoperAdd.getOperenabled());//账号是否可用
+                paramMap.put("opertype", ptoperAdd.getOpertype());//类别
+                paramMap.put("email", ptoperAdd.getEmail());
+                paramMap.put("operpasswd", MD5Helper.getMD5String(ptoperAdd.getOperpasswd()));
+                sqlD = "insert into ptoper  (issuper,sex,deptid,operphone,operid,otherphone,operenabled,opername,mobilephone,opertype,operpasswd,fillint6,email ) " +
+                        "values (:issuper, :sex, :deptid, :operphone, :operid, :otherphone, :operenabled,:opername, :mobilephone, :opertype, :operpasswd, PTOPERSEQUENCES.NEXTVAL, :email)";
+                skylineJdbc.update(sqlD, paramMap);
+            }else if ("operDel".equals(strRecordType)){
+                paramMap.put("operid", ptoperDel.getOperid());
+//                删除用户
+                sql = "DELETE ptoper j WHERE j.operid =:operid ";
+                skylineJdbc.update(sql, paramMap);
+//                删除用户授权
+                sqlD = "DELETE FROM ptoperrole j WHERE j.operid =:operid ";
+                skylineJdbc.update(sqlD, paramMap);
+            } else if ("operRoleUpd".equals(strRecordType)){
+                TreeNode[] nodes = selectedNode2;
+                paramMap.put("operid",operRoleUpdId);
+                sql = "DELETE ptoperrole j WHERE j.operid =:operid ";
+                skylineJdbc.update(sql, paramMap);
+                if(nodes != null && nodes.length > 0) {
+                    for (TreeNode node : nodes) {
+                        Map<String,Object> paramMapT = new HashMap<>();
+                        int subS = node.getData().toString().lastIndexOf("(");
+                        int subE = node.getData().toString().lastIndexOf(")");
+                        paramMapT.put("operid",operRoleUpdId);
+                        paramMapT.put("roleid",node.getData().toString().substring(subS+1,subE));
+                        sqlD = "INSERT INTO ptoperrole J (J.roleid, J.operid) VALUES (:roleid, :operid) ";
+                        skylineJdbc.update(sqlD, paramMapT);
+                    }
+                }
+            }
+        } catch (Exception e){
+            logger.error("编辑数据时出现错误。", e);
+            MessageUtil.addWarn("编辑数据时出现错误。" + e.getMessage());
+        }
+        onQuery();
     }
 
     public void addMessage(String summary) {
@@ -270,6 +349,14 @@ public class DeptManagerAction {
         this.operList = operList;
     }
 
+    public List<Ptrole> getOperRoleList() {
+        return operRoleList;
+    }
+
+    public void setOperRoleList(List<Ptrole> operRoleList) {
+        this.operRoleList = operRoleList;
+    }
+
     public TreeNode getRoot1() {
         return root1;
     }
@@ -278,12 +365,28 @@ public class DeptManagerAction {
         this.root1 = root1;
     }
 
+    public TreeNode getRoot2() {
+        return root2;
+    }
+
+    public void setRoot2(TreeNode root2) {
+        this.root2 = root2;
+    }
+
     public TreeNode getSelectedNode() {
         return selectedNode;
     }
 
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public TreeNode[] getSelectedNode2() {
+        return selectedNode2;
+    }
+
+    public void setSelectedNode2(TreeNode[] selectedNode2) {
+        this.selectedNode2 = selectedNode2;
     }
 
     public NamedParameterJdbcTemplate getSkylineJdbc() {
